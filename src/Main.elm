@@ -6,7 +6,6 @@ import Json.Decode as D exposing (Decoder)
 import Maybe
 
 import Browser exposing (Document, UrlRequest)
-import Maybe exposing (Maybe)
 import Url exposing (Url)
 import Browser.Navigation exposing (Key)
 import Html exposing (Html, div, h1, ul, li, span, text, a)
@@ -18,7 +17,6 @@ import Bootstrap.Grid as Grid
 import Bootstrap.Grid.Col as Col
 import Bootstrap.Table as Table exposing (cellAttr)
 
-import Constants
 import Commons exposing (..)
 import Components exposing (viewCityList)
 
@@ -27,25 +25,34 @@ import Components exposing (viewCityList)
 type alias Flags = {}
 
 type alias Model =
-    { cities : List(String)
-    , data : Maybe(List Weather)
+    { cities : List(City)
+    , data : List Weather
     }
 
-weatherDecoder : Decoder Weather
+weatherDecoder : Decoder WeatherResponse
 weatherDecoder =
-    D.map3 Weather
-        (D.field "id" D.int)
-        (D.field "main" D.string)
-        (D.field "description" D.string)
+    D.map2 WeatherResponse
+        (D.map2 City
+            (D.field "id" D.int)
+            (D.field "name" D.string)
+        )
+        (D.at ["weather", "0"]
+            (D.map3 Weather
+                (D.field "id" D.int )
+                (D.field "main" D.string )
+                (D.field "description" D.string )
+            )
+        )
 
-weatherListDecoder : Decoder (List Weather)
+
+weatherListDecoder : Decoder (List WeatherResponse)
 weatherListDecoder =
-    D.field "weather" (D.list weatherDecoder)
+    D.field "list" (D.list weatherDecoder)
 
 init : Flags -> Url.Url -> Key -> (Model, Cmd Msg)
 init flags url key =
     ( { cities = []
-      , data = Nothing
+      , data = []
       }
     , Cmd.none )
 
@@ -68,8 +75,10 @@ view model =
                             , Table.th [] [ text "Description" ]
                             ]
                         ]
-                        , tbody = case model.data of
-                            Just data ->
+                        , tbody = case List.length model.data of
+                            0 ->
+                                Table.tbody [] [ Table.tr [] [ Table.td [ cellAttr(colspan 3) ] [ text "Empty"] ] ]
+                            _ ->
                                 let
                                     row : Weather -> Table.Row msg
                                     row weather = Table.tr []
@@ -79,9 +88,7 @@ view model =
                                         ]
                                 in
                                 Table.tbody []
-                                    (List.map row data)
-                            Nothing ->
-                                Table.tbody [] [ Table.tr [] [ Table.td [ cellAttr(colspan 3) ] [ text "Empty"] ] ]
+                                    (List.map row model.data)
                         }
                     ]
                 ]
@@ -92,29 +99,55 @@ view model =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        ( ToggleCity city ) ->
+        ( ToggleCity cityName ) ->
             let
-                isCitySelected = List.member city model.cities
+                isCitySelected = List.any (\item -> item.name == cityName) model.cities
             in
             if isCitySelected then
-                ({ model | cities = List.filter (\item -> item /= city) model.cities }, Cmd.none)
+                ({ model | cities = List.filter (\item -> item.name /= cityName) model.cities }, Cmd.none)
             else
                 let
                     fetchCmd : Cmd Msg
                     fetchCmd = Http.get
-                        { url = "https://api.openweathermap.org/data/2.5/weather?q=" ++ city ++ ",de&APPID=47b167289268601ac3223838e2d3de5a"
-                        , expect = Http.expectJson GetCurrentWeather weatherListDecoder
+                        { url = "https://api.openweathermap.org/data/2.5/weather?q=" ++ cityName ++ ",de&APPID=47b167289268601ac3223838e2d3de5a"
+                        , expect = Http.expectJson GetCurrentWeather weatherDecoder
                         }
+                    city = { id = 0, name =cityName }
                 in
                 ({ model | cities = model.cities ++ [city] }, fetchCmd)
         ( GetCurrentWeather result ) ->
             case result of
                 Ok data ->
-                    ({ model | data = Maybe.Just(data) }, Cmd.none)
+                    let
+                        currentCity = data.city
+                        cities = List.map(\item ->
+                            if currentCity.name == item.name then
+                                currentCity
+                            else
+                                item
+                            ) model.cities
+                        cityIds = cities |> List.map (\item -> (String.fromInt item.id))
+
+                        fetchCmd : Cmd Msg
+                        fetchCmd = Http.get
+                            { url = "http://api.openweathermap.org/data/2.5/group?id=" ++ (String.join "," cityIds) ++ "&APPID=47b167289268601ac3223838e2d3de5a"
+                            , expect = Http.expectJson RefreshWeathers weatherListDecoder
+                            }
+                    in
+                    ({ model | cities = cities }, fetchCmd)
                 Err err ->
                     Debug.log "Scheisse passiert allen"
                     (model, Cmd.none)
-
+        ( RefreshWeathers result ) ->
+            case result of
+                Ok data ->
+                    let
+                        weatherList = data |> List.map (\item -> item.weather)
+                    in
+                    ({ model | data = weatherList }, Cmd.none)
+                Err err ->
+                    Debug.log "Scheisse passiert allen"
+                    (model, Cmd.none)
         _ -> ( model, Cmd.none )
 
 subscriptions : Model -> Sub Msg

@@ -6,17 +6,17 @@ import Html.Events exposing (onClick)
 import Bootstrap.ListGroup as ListGroup
 
 import Constants
-import Commons exposing (Msg)
+import Commons exposing (City, Msg)
 
-viewCityList : List String -> Html Msg
+viewCityList : List City -> Html Msg
 viewCityList selectedCities =
     ListGroup.ul
-        (List.map (\city ->
+        (List.map (\cityName ->
             let
-                isCitySelected = List.member city selectedCities
+                isCitySelected = List.any (\item -> item.name == cityName ) selectedCities
             in
                 ListGroup.li []
-                [ a [ onClick (Commons.ToggleCity city) ] [ text city ]
+                [ a [ onClick (Commons.ToggleCity cityName) ] [ text cityName ]
                 , case isCitySelected of
                     True -> span [ class "float-right" ] [ text (String.fromChar (Char.fromCode 9989)) ]
                     False -> span [] []
