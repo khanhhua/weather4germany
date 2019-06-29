@@ -6,4 +6,8 @@ cities =
     , "Hamburg"
     , "Frankfurt"
     , "Potsdam"
+    , "Essen"
+    , "Stralsund"
+    , "Stuttgart"
+    , "Munich"
     ]
