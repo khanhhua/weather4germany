@@ -7,14 +7,17 @@ import Json.Decode as D exposing (Decoder)
 import Browser exposing (Document, UrlRequest)
 import Url exposing (Url)
 import Browser.Navigation exposing (Key)
-import Html exposing (Html, h1, text)
+import Html exposing (Html, h1, div, text)
+import Html.Attributes exposing (class)
 
 import Bootstrap.CDN as CDN
+import Bootstrap.Grid.Row exposing (attrs)
 import Bootstrap.Grid as Grid
 import Bootstrap.Grid.Col as Col
+import Bootstrap.Dropdown as Dropdown
 
 import Commons exposing (..)
-import Components exposing (viewCityList, viewWeatherList)
+import Components exposing (dropdownCityList, viewWeatherList)
 
 -- API KEY = 47b167289268601ac3223838e2d3de5a
 
@@ -23,6 +26,7 @@ type alias Flags = {}
 type alias Model =
     { cities : List(City)
     , weatherList : List Weather
+    , cityDropDownState: Dropdown.State
     }
 
 weatherDecoder : Decoder WeatherResponse
@@ -50,6 +54,7 @@ init : Flags -> Url.Url -> Key -> (Model, Cmd Msg)
 init flags url key =
     ( { cities = []
       , weatherList = []
+      , cityDropDownState = Dropdown.initialState
       }
     , Cmd.none )
 
@@ -58,14 +63,14 @@ view model =
     { title = "Weather in Germany"
     , body =
         [ CDN.stylesheet
-        , Grid.container []
+        , Grid.container [ class "mt-5" ]
             [ h1 [] [ text "Weather in Germany" ]
-            , Grid.row []
-                [ Grid.col [ Col.sm4 ]
-                    [ (viewCityList model.cities )
-                    ]
-                , Grid.col [ Col.sm8 ]
+            , Grid.row [ attrs([ class "justify-content-center" ]) ]
+                [ Grid.col [ Col.lg8, Col.md ]
                     [ (viewWeatherList model.weatherList)
+                    , div [ class "text-center" ]
+                        [ (dropdownCityList model.cities model.cityDropDownState)
+                        ]
                     ]
                 ]
             ]
@@ -75,12 +80,20 @@ view model =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        ( ToggleDropdown state ) ->
+            ( { model | cityDropDownState = state }, Cmd.none)
         ( ToggleCity cityName ) ->
             let
                 isCitySelected = List.any (\item -> item.name == cityName) model.cities
+                weatherList = model.weatherList
+                    |> List.filter (\item -> item.city /= cityName)
             in
+            -- Remove if isCitySelected
             if isCitySelected then
-                ({ model | cities = List.filter (\item -> item.name /= cityName) model.cities }, Cmd.none)
+                ({ model
+                | cities = List.filter (\item -> item.name /= cityName) model.cities
+                , weatherList = weatherList
+                }, Cmd.none)
             else
                 let
                     fetchCmd : Cmd Msg
@@ -143,7 +156,9 @@ update msg model =
         _ -> ( model, Cmd.none )
 
 subscriptions : Model -> Sub Msg
-subscriptions model = Sub.none
+subscriptions model =
+    Sub.batch
+        [ Dropdown.subscriptions model.cityDropDownState ToggleDropdown ]
 
 main : Program Flags Model Msg
 main = Browser.application

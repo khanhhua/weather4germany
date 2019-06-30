@@ -9,5 +9,4 @@ cities =
     , "Essen"
     , "Stralsund"
     , "Stuttgart"
-    , "Munich"
     ]

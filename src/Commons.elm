@@ -3,6 +3,7 @@ module Commons exposing (..)
 import Browser exposing (UrlRequest)
 import Http
 import Url exposing (Url)
+import Bootstrap.Dropdown as Dropdown
 
 type Msg
     = ToggleCity String
@@ -11,6 +12,7 @@ type Msg
     | OnWeathersRefreshed (Result Http.Error (List WeatherResponse))
     | ClickedLink UrlRequest
     | UrlChange Url
+    | ToggleDropdown Dropdown.State
 
 type alias Weather =
     { id : Int
