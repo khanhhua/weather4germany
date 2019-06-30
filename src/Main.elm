@@ -1,6 +1,5 @@
 module Main exposing (main)
 
-import Debug
 import Http
 import Json.Decode as D exposing (Decoder)
 
@@ -124,8 +123,7 @@ update msg model =
                             }
                     in
                     ({ model | cities = cities }, fetchCmd)
-                Err err ->
-                    Debug.log "Scheisse passiert allen"
+                Err _ ->
                     (model, Cmd.none)
         ( OnWeathersRefreshed result ) ->
             case result of
@@ -140,8 +138,7 @@ update msg model =
                                 )
                     in
                     ({ model | weatherList = weatherList }, Cmd.none)
-                Err err ->
-                    Debug.log "Scheisse passiert allen"
+                Err _ ->
                     (model, Cmd.none)
         ( Refresh ) ->
             let
