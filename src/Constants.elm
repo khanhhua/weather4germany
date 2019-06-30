@@ -4,7 +4,7 @@ cities : List(String)
 cities =
     [ "Berlin"
     , "Hamburg"
-    , "Frankfurt"
+    , "Frankfurt am Main"
     , "Potsdam"
     , "Essen"
     , "Stralsund"
