@@ -19,6 +19,7 @@ type alias Weather =
     , main : String
     , description : String
     , city : String
+    , temperature : Float
     }
 
 type alias WeatherList = List(Weather)

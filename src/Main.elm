@@ -35,13 +35,12 @@ weatherDecoder =
             (D.field "id" D.int)
             (D.field "name" D.string)
         )
-        (D.at ["weather", "0"]
-            (D.map4 Weather
-                ( D.field "id" D.int )
-                ( D.field "main" D.string )
-                ( D.field "description" D.string )
-                ( D.succeed "")
-            )
+        (D.map5 Weather
+            ( D.at ["weather", "0", "id"] D.int )
+            ( D.at ["weather", "0", "main"] D.string )
+            ( D.at ["weather", "0", "description"] D.string )
+            ( D.field "name" D.string )
+            ( D.at ["main", "temp"] D.float )
         )
 
 
@@ -97,7 +96,7 @@ update msg model =
                 let
                     fetchCmd : Cmd Msg
                     fetchCmd = Http.get
-                        { url = "https://api.openweathermap.org/data/2.5/weather?q=" ++ cityName ++ ",de&APPID=47b167289268601ac3223838e2d3de5a"
+                        { url = "https://api.openweathermap.org/data/2.5/weather?q=" ++ cityName ++ ",de&units=metric&APPID=47b167289268601ac3223838e2d3de5a"
                         , expect = Http.expectJson OnCitySelected weatherDecoder
                         }
                     city = { id = 0, name =cityName }
@@ -118,7 +117,7 @@ update msg model =
 
                         fetchCmd : Cmd Msg
                         fetchCmd = Http.get
-                            { url = "http://api.openweathermap.org/data/2.5/group?id=" ++ (String.join "," cityIds) ++ "&APPID=47b167289268601ac3223838e2d3de5a"
+                            { url = "http://api.openweathermap.org/data/2.5/group?id=" ++ (String.join "," cityIds) ++ "&units=metric&APPID=47b167289268601ac3223838e2d3de5a"
                             , expect = Http.expectJson OnWeathersRefreshed weatherListDecoder
                             }
                     in

@@ -50,6 +50,7 @@ viewWeatherList weatherList =
             { options = []
             , thead = Table.thead [] [ Table.tr []
                 [ Table.th [] [ text "City" ]
+                , Table.th [ cellAttr (class "text-right") ] [ text "℃" ]
                 , Table.th [] [ text "ID" ]
                 , Table.th [] [ text "Main" ]
                 , Table.th [] [ text "Description" ]
@@ -60,13 +61,14 @@ viewWeatherList weatherList =
                 0 ->
                     Table.tbody []
                         [ Table.tr []
-                            [ Table.td [ cellAttr(colspan 4), cellAttr(class "text-center") ]
+                            [ Table.td [ cellAttr(colspan 5), cellAttr(class "text-center") ]
                                 [ text "Select a city"] ] ]
                 _ ->
                     let
                         row : Weather -> Table.Row Msg
                         row weather = Table.tr []
                             [ Table.td [] [ text weather.city ]
+                            , Table.td [ cellAttr (class "text-right") ] [ text (String.fromFloat weather.temperature) ]
                             , Table.td [] [ text (String.fromInt weather.id) ]
                             , Table.td [] [ text weather.main ]
                             , Table.td [] [ text weather.description ]
