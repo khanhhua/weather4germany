@@ -1858,7 +1858,7 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 		flagDecoder,
 		args,
 		impl.dl,
-		impl.dE,
+		impl.dF,
 		impl.dy,
 		function() { return function() {} }
 	);
@@ -3884,10 +3884,10 @@ var _Browser_element = _Debugger_element || F4(function(impl, flagDecoder, debug
 		flagDecoder,
 		args,
 		impl.dl,
-		impl.dE,
+		impl.dF,
 		impl.dy,
 		function(sendToApp, initialModel) {
-			var view = impl.dF;
+			var view = impl.dG;
 			/**/
 			var domNode = args['node'];
 			//*/
@@ -3920,11 +3920,11 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 		flagDecoder,
 		args,
 		impl.dl,
-		impl.dE,
+		impl.dF,
 		impl.dy,
 		function(sendToApp, initialModel) {
 			var divertHrefToApp = impl.ar && impl.ar(sendToApp)
-			var view = impl.dF;
+			var view = impl.dG;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
 			var currNode = _VirtualDom_virtualize(bodyNode);
@@ -3937,7 +3937,7 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
 				currNode = nextNode;
 				_VirtualDom_divertHrefToApp = 0;
-				(title !== doc.dB) && (_VirtualDom_doc.title = title = doc.dB);
+				(title !== doc.dC) && (_VirtualDom_doc.title = title = doc.dC);
 			});
 		}
 	);
@@ -4028,8 +4028,8 @@ function _Browser_application(impl)
 		{
 			return A3(impl.dl, flags, _Browser_getUrl(), key);
 		},
+		dG: impl.dG,
 		dF: impl.dF,
-		dE: impl.dE,
 		dy: impl.dy
 	});
 }
@@ -5872,21 +5872,22 @@ var author$project$Commons$City = F2(
 	function (id, name) {
 		return {cC: id, dp: name};
 	});
-var author$project$Commons$Weather = F4(
-	function (id, main, description, city) {
-		return {cr: city, dd: description, cC: id, $7: main};
+var author$project$Commons$Weather = F5(
+	function (id, main, description, city, temperature) {
+		return {cr: city, dd: description, cC: id, $7: main, dA: temperature};
 	});
 var author$project$Commons$WeatherResponse = F2(
 	function (city, weather) {
-		return {cr: city, dG: weather};
+		return {cr: city, dH: weather};
 	});
 var elm$json$Json$Decode$field = _Json_decodeField;
 var elm$json$Json$Decode$at = F2(
 	function (fields, decoder) {
 		return A3(elm$core$List$foldr, elm$json$Json$Decode$field, decoder, fields);
 	});
+var elm$json$Json$Decode$float = _Json_decodeFloat;
 var elm$json$Json$Decode$int = _Json_decodeInt;
-var elm$json$Json$Decode$map4 = _Json_map4;
+var elm$json$Json$Decode$map5 = _Json_map5;
 var elm$json$Json$Decode$string = _Json_decodeString;
 var author$project$Main$weatherDecoder = A3(
 	elm$json$Json$Decode$map2,
@@ -5896,17 +5897,30 @@ var author$project$Main$weatherDecoder = A3(
 		author$project$Commons$City,
 		A2(elm$json$Json$Decode$field, 'id', elm$json$Json$Decode$int),
 		A2(elm$json$Json$Decode$field, 'name', elm$json$Json$Decode$string)),
-	A2(
-		elm$json$Json$Decode$at,
-		_List_fromArray(
-			['weather', '0']),
-		A5(
-			elm$json$Json$Decode$map4,
-			author$project$Commons$Weather,
-			A2(elm$json$Json$Decode$field, 'id', elm$json$Json$Decode$int),
-			A2(elm$json$Json$Decode$field, 'main', elm$json$Json$Decode$string),
-			A2(elm$json$Json$Decode$field, 'description', elm$json$Json$Decode$string),
-			elm$json$Json$Decode$succeed(''))));
+	A6(
+		elm$json$Json$Decode$map5,
+		author$project$Commons$Weather,
+		A2(
+			elm$json$Json$Decode$at,
+			_List_fromArray(
+				['weather', '0', 'id']),
+			elm$json$Json$Decode$int),
+		A2(
+			elm$json$Json$Decode$at,
+			_List_fromArray(
+				['weather', '0', 'main']),
+			elm$json$Json$Decode$string),
+		A2(
+			elm$json$Json$Decode$at,
+			_List_fromArray(
+				['weather', '0', 'description']),
+			elm$json$Json$Decode$string),
+		A2(elm$json$Json$Decode$field, 'name', elm$json$Json$Decode$string),
+		A2(
+			elm$json$Json$Decode$at,
+			_List_fromArray(
+				['main', 'temp']),
+			elm$json$Json$Decode$float)));
 var elm$json$Json$Decode$list = _Json_decodeList;
 var author$project$Main$weatherListDecoder = A2(
 	elm$json$Json$Decode$field,
@@ -6653,7 +6667,7 @@ var author$project$Main$update = F2(
 					var fetchCmd = elm$http$Http$get(
 						{
 							b_: A2(elm$http$Http$expectJson, author$project$Commons$OnCitySelected, author$project$Main$weatherDecoder),
-							ck: 'https://api.openweathermap.org/data/2.5/weather?q=' + (cityName + ',de&APPID=47b167289268601ac3223838e2d3de5a')
+							ck: 'https://api.openweathermap.org/data/2.5/weather?q=' + (cityName + ',de&units=metric&APPID=47b167289268601ac3223838e2d3de5a')
 						});
 					var city = {cC: 0, dp: cityName};
 					return _Utils_Tuple2(
@@ -6687,7 +6701,7 @@ var author$project$Main$update = F2(
 					var fetchCmd = elm$http$Http$get(
 						{
 							b_: A2(elm$http$Http$expectJson, author$project$Commons$OnWeathersRefreshed, author$project$Main$weatherListDecoder),
-							ck: 'http://api.openweathermap.org/data/2.5/group?id=' + (A2(elm$core$String$join, ',', cityIds) + '&APPID=47b167289268601ac3223838e2d3de5a')
+							ck: 'http://api.openweathermap.org/data/2.5/group?id=' + (A2(elm$core$String$join, ',', cityIds) + '&units=metric&APPID=47b167289268601ac3223838e2d3de5a')
 						});
 					return _Utils_Tuple2(
 						_Utils_update(
@@ -6704,7 +6718,7 @@ var author$project$Main$update = F2(
 					var weatherList = A2(
 						elm$core$List$map,
 						function (item) {
-							var weather = item.dG;
+							var weather = item.dH;
 							return _Utils_update(
 								weather,
 								{cr: item.cr.dp});
@@ -7042,8 +7056,8 @@ var rundis$elm_bootstrap$Bootstrap$Dropdown$toConfig = function (options) {
 var rundis$elm_bootstrap$Bootstrap$Dropdown$dropdown = F2(
 	function (state, _n0) {
 		var status = state.o;
-		var toggleMsg = _n0.dD;
-		var toggleButton = _n0.dC;
+		var toggleMsg = _n0.dE;
+		var toggleButton = _n0.dD;
 		var items = _n0.dm;
 		var options = _n0.cM;
 		var config = rundis$elm_bootstrap$Bootstrap$Dropdown$toConfig(options);
@@ -7121,9 +7135,9 @@ var rundis$elm_bootstrap$Bootstrap$Dropdown$toggler = F2(
 				]));
 	});
 var elm$json$Json$Decode$map3 = _Json_map3;
-var elm$json$Json$Decode$float = _Json_decodeFloat;
 var rundis$elm_bootstrap$Bootstrap$Utilities$DomHelper$offsetHeight = A2(elm$json$Json$Decode$field, 'offsetHeight', elm$json$Json$Decode$float);
 var rundis$elm_bootstrap$Bootstrap$Utilities$DomHelper$offsetWidth = A2(elm$json$Json$Decode$field, 'offsetWidth', elm$json$Json$Decode$float);
+var elm$json$Json$Decode$map4 = _Json_map4;
 var rundis$elm_bootstrap$Bootstrap$Utilities$DomHelper$offsetLeft = A2(elm$json$Json$Decode$field, 'offsetLeft', elm$json$Json$Decode$float);
 var elm$json$Json$Decode$null = _Json_decodeNull;
 var rundis$elm_bootstrap$Bootstrap$Utilities$DomHelper$offsetParent = F2(
@@ -7433,7 +7447,7 @@ var author$project$Components$dropdownCityList = F2(
 				}(),
 				cM: _List_fromArray(
 					[rundis$elm_bootstrap$Bootstrap$Dropdown$alignMenuRight]),
-				dC: A2(
+				dD: A2(
 					rundis$elm_bootstrap$Bootstrap$Dropdown$toggle,
 					_List_fromArray(
 						[
@@ -7449,7 +7463,7 @@ var author$project$Components$dropdownCityList = F2(
 						[
 							elm$html$Html$text('Select City')
 						])),
-				dD: author$project$Commons$ToggleDropdown
+				dE: author$project$Commons$ToggleDropdown
 			});
 	});
 var author$project$Commons$Refresh = {$: 1};
@@ -8010,7 +8024,7 @@ var rundis$elm_bootstrap$Bootstrap$Table$table = function (rec) {
 			_List_fromArray(
 				[
 					rundis$elm_bootstrap$Bootstrap$Table$renderTHead(
-					A2(rundis$elm_bootstrap$Bootstrap$Table$maybeMapInversedTHead, isInversed, rec.dA)),
+					A2(rundis$elm_bootstrap$Bootstrap$Table$maybeMapInversedTHead, isInversed, rec.dB)),
 					rundis$elm_bootstrap$Bootstrap$Table$renderTBody(
 					A2(rundis$elm_bootstrap$Bootstrap$Table$maybeMapInversedTBody, isInversed, rec.dz))
 				])));
@@ -8082,7 +8096,7 @@ var author$project$Components$viewWeatherList = function (weatherList) {
 												_List_fromArray(
 													[
 														rundis$elm_bootstrap$Bootstrap$Table$cellAttr(
-														elm$html$Html$Attributes$colspan(4)),
+														elm$html$Html$Attributes$colspan(5)),
 														rundis$elm_bootstrap$Bootstrap$Table$cellAttr(
 														elm$html$Html$Attributes$class('text-center'))
 													]),
@@ -8105,6 +8119,18 @@ var author$project$Components$viewWeatherList = function (weatherList) {
 											_List_fromArray(
 												[
 													elm$html$Html$text(weather.cr)
+												])),
+											A2(
+											rundis$elm_bootstrap$Bootstrap$Table$td,
+											_List_fromArray(
+												[
+													rundis$elm_bootstrap$Bootstrap$Table$cellAttr(
+													elm$html$Html$Attributes$class('text-right'))
+												]),
+											_List_fromArray(
+												[
+													elm$html$Html$text(
+													elm$core$String$fromFloat(weather.dA))
 												])),
 											A2(
 											rundis$elm_bootstrap$Bootstrap$Table$td,
@@ -8155,7 +8181,7 @@ var author$project$Components$viewWeatherList = function (weatherList) {
 								A2(elm$core$List$map, row, weatherList));
 						}
 					}(),
-					dA: A2(
+					dB: A2(
 						rundis$elm_bootstrap$Bootstrap$Table$thead,
 						_List_Nil,
 						_List_fromArray(
@@ -8171,6 +8197,17 @@ var author$project$Components$viewWeatherList = function (weatherList) {
 										_List_fromArray(
 											[
 												elm$html$Html$text('City')
+											])),
+										A2(
+										rundis$elm_bootstrap$Bootstrap$Table$th,
+										_List_fromArray(
+											[
+												rundis$elm_bootstrap$Bootstrap$Table$cellAttr(
+												elm$html$Html$Attributes$class('text-right'))
+											]),
+										_List_fromArray(
+											[
+												elm$html$Html$text('℃')
 											])),
 										A2(
 										rundis$elm_bootstrap$Bootstrap$Table$th,
@@ -9106,12 +9143,12 @@ var author$project$Main$view = function (model) {
 							]))
 					]))
 			]),
-		dB: 'Weather in Germany'
+		dC: 'Weather in Germany'
 	};
 };
 var elm$browser$Browser$application = _Browser_application;
 var author$project$Main$main = elm$browser$Browser$application(
-	{dl: author$project$Main$init, dq: author$project$Commons$UrlChange, dr: author$project$Commons$ClickedLink, dy: author$project$Main$subscriptions, dE: author$project$Main$update, dF: author$project$Main$view});
+	{dl: author$project$Main$init, dq: author$project$Commons$UrlChange, dr: author$project$Commons$ClickedLink, dy: author$project$Main$subscriptions, dF: author$project$Main$update, dG: author$project$Main$view});
 _Platform_export({'Main':{'init':author$project$Main$main(
 	elm$json$Json$Decode$succeed(
 		{}))(0)}});}(this));
