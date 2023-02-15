@@ -117,7 +117,7 @@ update msg model =
 
                         fetchCmd : Cmd Msg
                         fetchCmd = Http.get
-                            { url = "http://api.openweathermap.org/data/2.5/group?id=" ++ (String.join "," cityIds) ++ "&units=metric&APPID=47b167289268601ac3223838e2d3de5a"
+                            { url = "https://api.openweathermap.org/data/2.5/group?id=" ++ (String.join "," cityIds) ++ "&units=metric&APPID=47b167289268601ac3223838e2d3de5a"
                             , expect = Http.expectJson OnWeathersRefreshed weatherListDecoder
                             }
                     in
@@ -144,7 +144,7 @@ update msg model =
                 cityIds = model.cities |> List.map (\item -> (String.fromInt item.id))
                 fetchCmd : Cmd Msg
                 fetchCmd = Http.get
-                    { url = "http://api.openweathermap.org/data/2.5/group?id=" ++ (String.join "," cityIds) ++ "&APPID=47b167289268601ac3223838e2d3de5a"
+                    { url = "https://api.openweathermap.org/data/2.5/group?id=" ++ (String.join "," cityIds) ++ "&APPID=47b167289268601ac3223838e2d3de5a"
                     , expect = Http.expectJson OnWeathersRefreshed weatherListDecoder
                     }
             in
